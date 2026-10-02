@@ -43,8 +43,8 @@ jobs:
       - name: Install lame (macOS/Linux)
         if: runner.os != 'Windows'
         run: |
-          if command -v brew >/dev/null; then brew install lame
-          elif command -v apt-get >/dev/null; then sudo apt-get update && sudo apt-get install -y libmp3lame-dev
+          if command -v brew >/dev/null; then brew install lame mpg123
+          elif command -v apt-get >/dev/null; then sudo apt-get update && sudo apt-get install -y libmp3lame-dev libmpg123-dev
           fi
 
       - name: Build LGPL ffmpeg (macOS/Linux)
@@ -58,7 +58,7 @@ jobs:
         with:
           msystem: MINGW64
           update: false
-          install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-lame
+          install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-lame make diffutils
 
       - name: Build LGPL ffmpeg (Windows) — run
         if: runner.os == 'Windows'

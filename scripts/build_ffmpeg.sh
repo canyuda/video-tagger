@@ -41,8 +41,16 @@ cd "${SRC}"
   --extra-ldflags="-L${LAME_PREFIX}/lib"
 
 # Static-link lame: replace -lmp3lame with the archive path before linking.
-# sed (not python3) for portability inside msys2 on Windows CI.
-sed -i.bak "s|-lmp3lame|${LAME_PREFIX}/lib/libmp3lame.a|g" ffbuild/config.mak
+# Some lame builds (recent brew) reference mpg123 symbols — append that
+# archive too when present. sed (not python3) for msys2 portability.
+LAME_A="${LAME_PREFIX}/lib/libmp3lame.a"
+MPG123_PREFIX="$(dirname "${LAME_PREFIX}")/mpg123"
+MPG123_A="${MPG123_PREFIX}/lib/libmpg123.a"
+if [[ -f "${MPG123_A}" ]]; then
+  sed -i.bak "s|-lmp3lame|${LAME_A} ${MPG123_A}|g" ffbuild/config.mak
+else
+  sed -i.bak "s|-lmp3lame|${LAME_A}|g" ffbuild/config.mak
+fi
 echo "config.mak: lame linked statically"
 
 make -j"$(sysctl -n hw.ncpu 2>/dev/null || nproc)" ffmpeg ffprobe
