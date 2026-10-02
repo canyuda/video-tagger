@@ -17,8 +17,6 @@ import socket
 import sys
 from pathlib import Path
 
-from sidecar.classify.factory import DATA_ROOT
-
 
 def free_port() -> int:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -35,7 +33,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     db_path = args.db or _app_data_dir() / "tasks.db"
-    work_root = args.work_root or DATA_ROOT / "work"
+    # Stable per-user dir — NOT the PyInstaller _MEIPASS (random per launch,
+    # wiped on exit): frames/cache must survive restarts.
+    work_root = args.work_root or _app_data_dir() / "work"
     env_file = args.env_file or _resolve_env_file()
 
     import uvicorn
