@@ -1,0 +1,32 @@
+# Secrets — never commit
+.env.local
+.env.*.local
+.env
+*.pem
+secrets/
+
+# Python (Phase 0 CLI / sidecar)
+__pycache__/
+*.pyc
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+
+# Node / frontend
+node_modules/
+
+# Tauri / Rust
+src-tauri/target/
+
+# App data, caches, logs (root-anchored so tool skill data dirs are not affected)
+/data/
+*.log
+
+# Tool local index (codegraph MCP)
+.codegraph/
+
+# macOS
+.DS_Store
