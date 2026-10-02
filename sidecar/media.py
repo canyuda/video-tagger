@@ -78,9 +78,9 @@ def _binary(name: str) -> str:
         # dev/source: repo root /ffmpeg-bin
         base_candidates.append(Path(__file__).resolve().parents[1] / "ffmpeg-bin")
     for base in base_candidates:
-        candidate = base / name
-        if candidate.is_file():
-            return str(candidate)
+        for candidate in (base / name, base / f"{name}.exe"):  # Windows ships .exe
+            if candidate.is_file():
+                return str(candidate)
     return name  # PATH fallback
 
 

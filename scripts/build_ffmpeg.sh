@@ -53,13 +53,21 @@ else
 fi
 echo "config.mak: lame linked statically"
 
-make -j"$(sysctl -n hw.ncpu 2>/dev/null || nproc)" ffmpeg ffprobe
-rm -f ffmpeg ffprobe   # force relink AFTER the static patch (make caches ffmpeg_g)
-make -j2 ffmpeg ffprobe
+# Default target builds every enabled program — target-name differences
+# across platforms (Windows emits .exe) stay out of the invocation.
+make -j"$(sysctl -n hw.ncpu 2>/dev/null || nproc)"
 
 otool -L ffmpeg 2>/dev/null | grep -q lame && echo "WARNING: ffmpeg still links lame dynamically" >&2 || true
 ldd ffmpeg 2>/dev/null | grep -q lame && echo "WARNING: ffmpeg still links lame dynamically" >&2 || true
 
-cp -f ffmpeg ffprobe "${ROOT}/ffmpeg-bin/"
+for name in ffmpeg ffprobe; do
+  for candidate in "${name}.exe" "${name}"; do
+    if [[ -f "${candidate}" ]]; then
+      cp -f "${candidate}" "${ROOT}/ffmpeg-bin/${candidate}"
+      break
+    fi
+  done
+done
 cp -f COPYING.LGPLv2.1 "${ROOT}/ffmpeg-bin/" 2>/dev/null || true
+ls -la "${ROOT}/ffmpeg-bin/"
 echo "LGPL ffmpeg ${VERSION} -> ${ROOT}/ffmpeg-bin/"
