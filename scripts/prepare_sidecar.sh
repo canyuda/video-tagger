@@ -25,19 +25,24 @@ EOF
 fi
 
 # release: PyInstaller onefile
-if [[ ! -x "${ROOT}/ffmpeg-bin/ffmpeg" ]]; then
+if [[ ! -f "${ROOT}/ffmpeg-bin/ffmpeg" && ! -f "${ROOT}/ffmpeg-bin/ffmpeg.exe" ]]; then
   echo "ffmpeg-bin/ffmpeg missing — run scripts/build_ffmpeg.sh first (docs/04 §8 LGPL)" >&2
   exit 1
 fi
 cd "${ROOT}"
+# PyInstaller uses ':' as src:dest separator on unix, ';' on Windows.
+SEP=":"
+if [[ "${TRIPLE}" == *windows* ]]; then
+  SEP=";"
+fi
 uv run pyinstaller \
   --onefile \
   --name video-tagger-sidecar \
   --distpath "${BIN_DIR}/dist" \
   --workpath "${BIN_DIR}/build" \
   --specpath "${BIN_DIR}" \
-  --add-data "${ROOT}/sidecar/taxonomy/default.json:sidecar/taxonomy" \
-  --add-data "${ROOT}/ffmpeg-bin:ffmpeg-bin" \
+  --add-data "${ROOT}/sidecar/taxonomy/default.json${SEP}sidecar/taxonomy" \
+  --add-data "${ROOT}/ffmpeg-bin${SEP}ffmpeg-bin" \
   --collect-submodules uvicorn \
   sidecar/api/run.py
 
