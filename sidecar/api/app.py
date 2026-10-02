@@ -183,7 +183,7 @@ def create_app(
     @app.get("/tasks/{task_id}/frames")
     def list_frames(task_id: str) -> list[dict]:
         """Perception frame preview list (docs/06 §3.1). Images themselves are
-        served by /tasks/{id}/frames/{index}.jpg with ?token= for <img> tags."""
+        served by /tasks/{id}/frames/{name} with ?token= for <img> tags."""
         task = _require_task(app, task_id)
         if not task.get("file_hash") or app.state.work_root is None:
             return []
@@ -191,7 +191,7 @@ def create_app(
         if not frames_dir.is_dir():
             return []
         return [
-            {"index": i, "url": f"/tasks/{task_id}/frames/{i}.jpg?token={app.state.token}",
+            {"index": i, "url": f"/tasks/{task_id}/frames/{p.name}?token={app.state.token}",
              "name": p.name}
             for i, p in enumerate(sorted(frames_dir.glob("frame_*.jpg")))
         ]
@@ -200,12 +200,12 @@ def create_app(
     def get_frame(task_id: str, name: str) -> StreamingResponse:
         import re as _re
 
-        if not _re.fullmatch(r"\d{4}\.jpg", name):
+        if not _re.fullmatch(r"frame_\d{4}\.jpg", name):
             raise HTTPException(400, "bad frame name")
         task = _require_task(app, task_id)
         if not task.get("file_hash") or app.state.work_root is None:
             raise HTTPException(404, "no frames")
-        path = app.state.work_root / task["file_hash"][:16] / "frames" / f"frame_{name}"
+        path = app.state.work_root / task["file_hash"][:16] / "frames" / name
         if not path.is_file():
             raise HTTPException(404, "no frames")
         return StreamingResponse(path.open("rb"), media_type="image/jpeg")

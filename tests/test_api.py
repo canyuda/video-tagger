@@ -250,3 +250,39 @@ class TestCors:
         r = client.get("/health", headers={"Origin": "http://evil.example"})
         assert "access-control-allow-origin" not in r.headers or \
             r.headers.get("access-control-allow-origin") != "http://evil.example"
+
+
+class TestFrames:
+    def _task_with_frames(self, client, tmp_path):
+        f = tmp_path / "v.mp4"
+        f.write_bytes(b"x")
+        task = client.post("/tasks/local", headers=auth(client),
+                           json={"paths": [str(f)]}).json()["created"][0]
+        frames_dir = tmp_path / "work" / ("h" * 16) / "frames"
+        frames_dir.mkdir(parents=True)
+        for i in range(3):
+            (frames_dir / f"frame_{i:04d}.jpg").write_bytes(b"\xff\xd8fake")
+        store: Store = client.app.state.store
+        store.update_task(task["id"], file_hash="h" * 64, status="classified")
+        return task["id"]
+
+    def test_list_returns_full_names(self, client, tmp_path):
+        tid = self._task_with_frames(client, tmp_path)
+        frames = client.get(f"/tasks/{tid}/frames", headers=auth(client)).json()
+        assert [f["name"] for f in frames] == ["frame_0000.jpg", "frame_0001.jpg", "frame_0002.jpg"]
+        assert "frame_0000.jpg" in frames[0]["url"]
+
+    def test_get_frame_serves_image(self, client, tmp_path):
+        tid = self._task_with_frames(client, tmp_path)
+        token = client.app.state.token
+        r = client.get(f"/tasks/{tid}/frames/frame_0001.jpg?token={token}")
+        assert r.status_code == 200
+        assert r.headers["content-type"] == "image/jpeg"
+
+    def test_get_frame_rejects_bad_names(self, client, tmp_path):
+        tid = self._task_with_frames(client, tmp_path)
+        token = client.app.state.token
+        for bad in ("0.jpg", "../v.mp4", "frame_12.jpg"):
+            assert client.get(
+                f"/tasks/{tid}/frames/{bad}?token={token}"
+            ).status_code in (400, 404)
