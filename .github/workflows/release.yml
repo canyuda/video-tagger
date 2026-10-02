@@ -52,10 +52,13 @@ jobs:
           msystem: MINGW64
           update: false
           install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-lame
+
+      - name: Build LGPL ffmpeg (Windows) — run
+        if: runner.os == 'Windows'
+        shell: msys2 {0}
         run: |
           cd "$GITHUB_WORKSPACE"
           bash scripts/build_ffmpeg.sh
-        shell: msys2 {0}
 
       - name: Install frontend deps
         run: npm ci
