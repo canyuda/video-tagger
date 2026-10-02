@@ -13,6 +13,7 @@ import secrets
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 
 from sidecar.config import ConfigError, Settings, load_settings
@@ -21,6 +22,16 @@ from sidecar.store import Store
 from sidecar.taxonomy import TaxonomyError, builtin_taxonomy, load_taxonomy
 
 TAXONOMY_SETTING_KEY = "taxonomy"
+
+# The webview origin is tauri://localhost (macOS) / http(s)://tauri.localhost
+# (Windows); dev uses the vite origin. Without CORS the WKWebView blocks
+# every fetch from the UI with "Load failed".
+ALLOWED_ORIGINS = (
+    "tauri://localhost",
+    "https://tauri.localhost",
+    "http://tauri.localhost",
+    "http://localhost:5173",
+)
 
 
 def create_app(
@@ -34,6 +45,12 @@ def create_app(
     settings_file: Path | None = None,
 ) -> FastAPI:
     app = FastAPI(title="video-tagger-sidecar", docs_url=None, redoc_url=None)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(ALLOWED_ORIGINS),
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     app.state.token = token or secrets.token_urlsafe(32)
     app.state.bus = EventBus()
     app.state.store = Store(db_path)
@@ -74,7 +91,9 @@ def create_app(
 
     @app.middleware("http")
     async def _auth(request: Request, call_next):
-        if request.url.path == "/health":
+        if request.url.path == "/health" or request.method == "OPTIONS":
+            # /health is open by design; OPTIONS is the CORS preflight
+            # (no custom headers on preflight requests).
             return await call_next(request)
         provided = request.headers.get("X-Auth-Token", "")
         if not provided:

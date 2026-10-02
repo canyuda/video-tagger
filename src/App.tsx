@@ -48,16 +48,36 @@ export default function App() {
           return;
         }
         configureSidecar(info);
+        let healthy = false;
         for (let i = 0; i < 40; i++) {
           try {
             await api.health();
+            healthy = true;
             break;
           } catch {
             await new Promise((r) => setTimeout(r, 250));
           }
         }
         if (cancelled) return;
-        setSettings(await api.settings());
+        if (!healthy) {
+          setFatal("分类服务已启动但 HTTP 未就绪（详见 应用数据目录/sidecar.log）");
+          return;
+        }
+        let s: SettingsView | null = null;
+        for (let i = 0; i < 12; i++) {
+          try {
+            s = await api.settings();
+            break;
+          } catch {
+            await new Promise((r) => setTimeout(r, 250));
+          }
+        }
+        if (cancelled) return;
+        if (!s) {
+          setFatal("无法读取设置（分类服务 HTTP 未就绪）");
+          return;
+        }
+        setSettings(s);
         setReady(true);
         await refresh();
       } catch (e) {

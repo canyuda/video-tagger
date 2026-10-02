@@ -227,3 +227,26 @@ class TestSettings:
     def test_put_keys_rejects_unknown(self, client):
         assert client.put("/settings/keys", headers=auth(client),
                           json={"SECRET": "x"}).status_code == 422
+
+
+class TestCors:
+    """The Tauri webview origin is cross-origin to 127.0.0.1 — WKWebView
+    blocks every fetch without CORS headers ("Load failed")."""
+
+    def test_preflight_options_open_without_token(self, client):
+        r = client.options("/tasks", headers={
+            "Origin": "tauri://localhost",
+            "Access-Control-Request-Method": "GET",
+            "Access-Control-Request-Headers": "x-auth-token",
+        })
+        assert r.status_code in (200, 204)
+        assert r.headers["access-control-allow-origin"] == "tauri://localhost"
+
+    def test_response_carries_cors_headers(self, client):
+        r = client.get("/health", headers={"Origin": "https://tauri.localhost"})
+        assert r.headers.get("access-control-allow-origin") == "https://tauri.localhost"
+
+    def test_unknown_origin_rejected(self, client):
+        r = client.get("/health", headers={"Origin": "http://evil.example"})
+        assert "access-control-allow-origin" not in r.headers or \
+            r.headers.get("access-control-allow-origin") != "http://evil.example"
