@@ -1,0 +1,62 @@
+{
+  "type": "object",
+  "properties": {
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "person-facing-camera",
+          "multiple-speakers",
+          "interview-setting",
+          "stage-fullbody-dance",
+          "gesture-performance",
+          "product-closeup",
+          "text-heavy-slide",
+          "screen-recording-ui",
+          "hud-ui-game",
+          "subtitle-bar-embedded",
+          "on-screen-stickers",
+          "outdoor-scenery",
+          "cinematic-edit",
+          "animation-heavy",
+          "food-closeup",
+          "pets-or-animals",
+          "talking-head-with-broll",
+          "conversational-speech",
+          "voiceover-narration",
+          "lyrics-like",
+          "no-speech"
+        ]
+      },
+      "maxItems": 8,
+      "description": "Observed facts about the video; pick only from the enum, at most 8"
+    },
+    "free_note": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional short English note for forms the tags cannot express"
+    },
+    "summary_zh": {
+      "type": "string",
+      "description": "One-sentence Chinese evidence summary"
+    },
+    "other_guess": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Optional English guess if the form seems outside the taxonomy"
+    }
+  },
+  "required": [
+    "tags",
+    "summary_zh"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Observations",
+  "version": 1
+}

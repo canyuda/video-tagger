@@ -1,0 +1,74 @@
+[
+  {
+    "method": "POST",
+    "url": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    "request_headers": {
+      "authorization": "<redacted>",
+      "content-type": "application/json"
+    },
+    "request_body": {
+      "model": "qwen3-vl-flash",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Answer with JSON: answer='ok', flag=true"
+        }
+      ],
+      "response_format": {
+        "type": "json_schema",
+        "json_schema": {
+          "name": "output",
+          "schema": {
+            "type": "object",
+            "properties": {
+              "answer": {
+                "type": "string"
+              },
+              "flag": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "answer",
+              "flag"
+            ],
+            "additionalProperties": false
+          },
+          "strict": true
+        }
+      }
+    },
+    "status": 200,
+    "response_body": {
+      "choices": [
+        {
+          "message": {
+            "content": "{\"answer\": \"ok\", \"flag\": true}",
+            "reasoning_content": "",
+            "role": "assistant"
+          },
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null
+        }
+      ],
+      "object": "chat.completion",
+      "usage": {
+        "prompt_tokens": 87,
+        "completion_tokens": 12,
+        "total_tokens": 99,
+        "completion_tokens_details": {
+          "text_tokens": 12
+        },
+        "prompt_tokens_details": {
+          "text_tokens": 87,
+          "cached_tokens": 0
+        }
+      },
+      "created": 1790947487,
+      "system_fingerprint": null,
+      "model": "qwen3-vl-flash",
+      "id": "chatcmpl-4d08538f-3fc0-9991-b9f3-7b04c9c9ca6a"
+    }
+  }
+]

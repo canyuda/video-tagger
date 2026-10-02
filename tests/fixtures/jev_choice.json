@@ -1,0 +1,47 @@
+[
+  {
+    "method": "POST",
+    "url": "https://api.typesafe.ai/v1/systemone",
+    "request_headers": {
+      "authorization": "<redacted>",
+      "content-type": "application/json"
+    },
+    "request_body": {
+      "state": {
+        "ticket": "My order #1234 arrived damaged and I want a refund."
+      },
+      "model": "jev-latest",
+      "questions": {
+        "urgency": {
+          "type": "choice",
+          "instructions": "How urgent is this support ticket?",
+          "criteria": {
+            "high": "Needs immediate handling",
+            "normal": "Can wait a day",
+            "low": "Informational"
+          }
+        }
+      }
+    },
+    "status": 200,
+    "response_body": {
+      "model": "jev-1.13.0",
+      "answers": {
+        "urgency": {
+          "type": "choice",
+          "choice": "normal",
+          "confidence": 0.42,
+          "probabilities": {
+            "high": 0.38,
+            "low": 0.0,
+            "normal": 0.62
+          }
+        }
+      },
+      "usage": {
+        "input_tokens": 348,
+        "output_tokens": 39
+      }
+    }
+  }
+]

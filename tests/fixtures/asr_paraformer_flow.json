@@ -1,0 +1,286 @@
+[
+  {
+    "method": "GET",
+    "url": "https://dashscope.aliyuncs.com/api/v1/uploads",
+    "request_headers": {
+      "authorization": "<redacted>"
+    },
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "data": {
+        "policy": "<ephemeral-redacted>",
+        "signature": "<ephemeral-redacted>",
+        "upload_dir": "dashscope-instant/b4fdb9ead1e98c2de1364848774e6ca9/2026-10-02/47736874-9ea7-9b58-8132-5dc442af9756",
+        "upload_host": "https://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com",
+        "expire_in_seconds": 300,
+        "max_file_size_mb": 1024,
+        "capacity_limit_mb": 999999999,
+        "oss_access_key_id": "<ephemeral-redacted>",
+        "x_oss_object_acl": "private",
+        "x_oss_forbid_overwrite": "true"
+      },
+      "request_id": "47736874-9ea7-9b58-8132-5dc442af9756"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "https://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com",
+    "request_headers": {
+      "authorization": "<redacted>",
+      "content-type": "multipart/form-data; boundary=5f9bbe889af6cc4c3e66bce7db45e630"
+    },
+    "request_body": {
+      "_raw_multipart_scrubbed": "--5f9bbe889af6cc4c3e66bce7db45e630\r\nContent-Disposition: form-data; \n\"key\"\r\n\r\ndashscope-instant/b4fdb9ead1e98c2de1364848774e6ca9/2026-10-02/47736874-9ea7-9b58-8132-5dc442af9756/audio_sample.mp3\r\n--5f9bbe889af6cc4c3e66bce7db45e630\r\nContent-Disposition: form-data; \n\"x-oss-object-acl\"\r\n\r\nprivate\r\n--5f9bbe889af6cc4c3e66bce7db45e630\r\nContent-Disposition: form-data; \n\"x-oss-forbid-overwrite\"\r\n\r\ntrue\r\n--5f9bbe889af6cc4c3e66bce7db45e630\r\nContent-Disposition: form-data; \n\"success_action_status\"\r\n\r\n200\r\n--5f9bbe889af6cc4c3e66bce7db45e630\r\nContent-Disposition: form-data; \n\"file\"; file\n\"audio_sample.mp3\"\r\nContent-Type: audio/mpeg\r\n\r\nID3\u0004\u0000\u0000\u0000\u0000\u0001BTXXX\u0000\u0000\u0000\u0013\u0000\u0000\u0003minor_version\u0000512\u0000TXXX\u0000\u0000\u0000\u0012\u0000\u0000\u0003major_brand\u0000isom\u0000TXXX\u0000\u0000\u0000$\u0000\u0000\u0003compatible_brands\u0000isomiso2avc1mp41\u0000TXXX\u0000\u0000\u0000.\u0000\u0000\u0003comment\u0000vid:v0300fg10000ccbj"
+    },
+    "status": 200,
+    "response_body": null
+  },
+  {
+    "method": "POST",
+    "url": "https://dashscope.aliyuncs.com/api/v1/services/audio/asr/transcription",
+    "request_headers": {
+      "authorization": "<redacted>",
+      "x-dashscope-async": "enable",
+      "x-dashscope-ossresourceresolve": "enable",
+      "content-type": "application/json"
+    },
+    "request_body": {
+      "model": "paraformer-v2",
+      "input": {
+        "file_urls": [
+          "oss://dashscope-instant/b4fdb9ead1e98c2de1364848774e6ca9/2026-10-02/47736874-9ea7-9b58-8132-5dc442af9756/audio_sample.mp3"
+        ]
+      }
+    },
+    "status": 200,
+    "response_body": {
+      "request_id": "9f5abad8-6595-9af7-96c7-741e13dbae6b",
+      "output": {
+        "task_id": "37708062-5e34-40a0-9cec-f773451826c7",
+        "task_status": "PENDING"
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "https://dashscope.aliyuncs.com/api/v1/tasks/37708062-5e34-40a0-9cec-f773451826c7",
+    "request_headers": {
+      "authorization": "<redacted>"
+    },
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "request_id": "6542a159-fd3b-93a5-8b02-8a8509abefb3",
+      "output": {
+        "task_id": "37708062-5e34-40a0-9cec-f773451826c7",
+        "task_status": "RUNNING",
+        "submit_time": "2026-10-02 21:24:48.119",
+        "scheduled_time": "2026-10-02 21:24:48.179",
+        "task_metrics": {
+          "TOTAL": 1,
+          "SUCCEEDED": 0,
+          "FAILED": 0
+        }
+      }
+    }
+  },
+  {
+    "method": "POST",
+    "url": "https://dashscope.aliyuncs.com/api/v1/tasks/37708062-5e34-40a0-9cec-f773451826c7",
+    "request_headers": {
+      "authorization": "<redacted>"
+    },
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "request_id": "3f1d1942-a4ad-9f90-b7e1-e95a4ec2757f",
+      "output": {
+        "task_id": "37708062-5e34-40a0-9cec-f773451826c7",
+        "task_status": "SUCCEEDED",
+        "submit_time": "2026-10-02 21:24:48.119",
+        "scheduled_time": "2026-10-02 21:24:48.179",
+        "end_time": "2026-10-02 21:24:48.858",
+        "results": [
+          {
+            "output": {
+              "file_url": "http://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com/dashscope-instant/b4fdb9ead1e98c2de1364848774e6ca9/2026-10-02/47736874-9ea7-9b58-8132-5dc442af9756/audio_sample.mp3",
+              "results": [
+                {
+                  "file_url": "http://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com/dashscope-instant/b4fdb9ead1e98c2de1364848774e6ca9/2026-10-02/47736874-9ea7-9b58-8132-5dc442af9756/audio_sample.mp3",
+                  "results": [],
+                  "transcription_url": "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/paraformer-v2/20261002/21%3A24/01d7beb4-49de-446b-8397-7333f49405e4-1.json",
+                  "subtask_status": "SUCCEEDED"
+                }
+              ],
+              "transcription_url": "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/paraformer-v2/20261002/21%3A24/01d7beb4-49de-446b-8397-7333f49405e4-1.json",
+              "subtask_status": "SUCCEEDED"
+            },
+            "file_url": "http://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com/dashscope-instant/b4fdb9ead1e98c2de1364848774e6ca9/2026-10-02/47736874-9ea7-9b58-8132-5dc442af9756/audio_sample.mp3",
+            "usage": {
+              "duration": 8
+            },
+            "request_id": "01d7beb4-49de-446b-8397-7333f49405e4-1",
+            "results": [
+              {
+                "file_url": "http://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com/dashscope-instant/b4fdb9ead1e98c2de1364848774e6ca9/2026-10-02/47736874-9ea7-9b58-8132-5dc442af9756/audio_sample.mp3",
+                "results": [],
+                "transcription_url": "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/paraformer-v2/20261002/21%3A24/01d7beb4-49de-446b-8397-7333f49405e4-1.json",
+                "subtask_status": "SUCCEEDED"
+              }
+            ],
+            "transcription_url": "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/paraformer-v2/20261002/21%3A24/01d7beb4-49de-446b-8397-7333f49405e4-1.json",
+            "subtask_status": "SUCCEEDED"
+          }
+        ],
+        "task_metrics": {
+          "TOTAL": 1,
+          "SUCCEEDED": 1,
+          "FAILED": 0
+        }
+      },
+      "usage": {
+        "duration": 8
+      }
+    }
+  },
+  {
+    "method": "GET",
+    "url": "https://dashscope-result-bj.oss-cn-beijing.aliyuncs.com/prod/paraformer-v2/20261002/21%3A24/01d7beb4-49de-446b-8397-7333f49405e4-1.json",
+    "request_headers": {
+      "authorization": "<redacted>"
+    },
+    "request_body": null,
+    "status": 200,
+    "response_body": {
+      "file_url": "http://dashscope-file-mgr.oss-cn-beijing.aliyuncs.com/dashscope-instant/b4fdb9ead1e98c2de1364848774e6ca9/2026-10-02/47736874-9ea7-9b58-8132-5dc442af9756/audio_sample.mp3",
+      "properties": {
+        "audio_format": "mp3",
+        "channels": [
+          0
+        ],
+        "original_sampling_rate": 16000,
+        "original_duration_in_milliseconds": 11516
+      },
+      "transcripts": [
+        {
+          "channel_id": 0,
+          "content_duration_in_milliseconds": 7580,
+          "text": "我们简直就是萌妹的大掌辈，总在跟小崩。",
+          "sentences": [
+            {
+              "begin_time": 0,
+              "end_time": 7580,
+              "text": "我们简直就是萌妹的大掌辈，总在跟小崩。",
+              "sentence_id": 1,
+              "words": [
+                {
+                  "begin_time": 0,
+                  "end_time": 281,
+                  "text": "我",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 281,
+                  "end_time": 563,
+                  "text": "们",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 563,
+                  "end_time": 845,
+                  "text": "简",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 845,
+                  "end_time": 1126,
+                  "text": "直",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 1126,
+                  "end_time": 1408,
+                  "text": "就",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 1408,
+                  "end_time": 1690,
+                  "text": "是",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 1690,
+                  "end_time": 1971,
+                  "text": "萌",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 1971,
+                  "end_time": 2253,
+                  "text": "妹",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 2253,
+                  "end_time": 2535,
+                  "text": "的",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 2535,
+                  "end_time": 2816,
+                  "text": "大",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 2816,
+                  "end_time": 3098,
+                  "text": "掌",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 3098,
+                  "end_time": 3380,
+                  "text": "辈",
+                  "punctuation": "，"
+                },
+                {
+                  "begin_time": 5240,
+                  "end_time": 5708,
+                  "text": "总",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 5708,
+                  "end_time": 6176,
+                  "text": "在",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 6176,
+                  "end_time": 6644,
+                  "text": "跟",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 6644,
+                  "end_time": 7112,
+                  "text": "小",
+                  "punctuation": ""
+                },
+                {
+                  "begin_time": 7112,
+                  "end_time": 7580,
+                  "text": "崩",
+                  "punctuation": "。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+]

@@ -1,0 +1,87 @@
+name: release
+
+# Builds the installers per platform. The sidecar (PyInstaller) and NSIS/DMG
+# are platform-specific, so the Windows exe/msi must come from CI (docs/04 §8:
+# dual-platform CI on GitHub Actions).
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            triple: aarch64-apple-darwin
+            note: dmg (Apple Silicon)
+          - os: windows-latest
+            triple: x86_64-pc-windows-msvc
+            note: exe (NSIS, x64)
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # docs/04 §8: distribution must bundle an LGPL ffmpeg. Built from source
+      # (no --enable-gpl) on every platform; windows runs it inside msys2.
+      - name: Build LGPL ffmpeg (macOS/Linux)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: bash scripts/build_ffmpeg.sh
+
+      - name: Build LGPL ffmpeg (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: false
+          install: mingw-w64-x86_64-toolchain mingw-w64-x86_64-lame
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          bash scripts/build_ffmpeg.sh
+        shell: msys2 {0}
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Sync contracts
+        run: uv run python scripts/export_contracts.py
+
+      - name: Copy contracts into src
+        shell: bash
+        run: cp shared/types.ts src/contracts.ts
+
+      # Tauri beforeBuildCommand runs prepare_sidecar.sh (bash) — available on
+      # windows runners via the bundled bash. It produces
+      # src-tauri/binaries/video-tagger-sidecar-<triple> via PyInstaller.
+      - name: Build app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target ${{ matrix.triple }}
+
+      - name: Upload installers
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-tagger-${{ matrix.triple }}
+          path: |
+            src-tauri/target/${{ matrix.triple }}/release/bundle/dmg/*.dmg
+            src-tauri/target/${{ matrix.triple }}/release/bundle/nsis/*.exe
+          if-no-files-found: error

@@ -1,0 +1,82 @@
+{
+  "version": 3,
+  "types": [
+    {
+      "name": "口播",
+      "name_en": "monologue",
+      "worthy": true,
+      "hint": "一个人对镜头持续说话，向观众输出观点、知识、经验或讲故事；不推销商品。仅摆姿势、对嘴型、跟音乐做手势、小孩玩闹不算口播。",
+      "hint_en": "One person talks to camera, sharing opinions, knowledge, experience or a story; no selling. Requires sustained audible talking to the audience — a person merely posing, gesturing to music, lip-syncing, or a child playing is NOT a monologue. Others may appear on screen or interject briefly: still a monologue if ONE voice carries the content throughout."
+    },
+    {
+      "name": "带货口播",
+      "name_en": "sales_pitch",
+      "worthy": true,
+      "hint": "对镜头推销商品：常见商品特写、价格/优惠字幕、购物车引导、\"点击左下角链接\"类话术。",
+      "hint_en": "A person pitches products to camera: product close-ups, price/discount overlays, shopping-cart prompts, buy-link calls to action."
+    },
+    {
+      "name": "访谈",
+      "name_en": "interview",
+      "worthy": true,
+      "hint": "两人或多人在问答/对话，有明确的采访者与被访者关系（含播客对谈形态）。",
+      "hint_en": "Two or more people in alternating question-and-answer exchanges with interviewer and guest roles, including podcast-style dialogue. One person talking continuously while others sit nearby and listen is a monologue, NOT an interview."
+    },
+    {
+      "name": "解说",
+      "name_en": "commentary",
+      "worthy": true,
+      "hint": "画外音解说覆盖在游戏、影视或其他素材上，解说本身是内容主体。有解说的游戏/影视一律归此类。",
+      "hint_en": "Voice-over narration is the main content over game, film or other footage. Narrated gameplay or film clips belong here, not gameplay."
+    },
+    {
+      "name": "教学·录屏",
+      "name_en": "tutorial",
+      "worthy": true,
+      "hint": "分步骤教学或操作演示：桌面/手机录屏、软件界面、代码编辑器、PPT 翻页讲解。",
+      "hint_en": "Step-by-step teaching or how-to demonstration: desktop or phone screen recording, app UI, code editor, slide walkthrough."
+    },
+    {
+      "name": "剧情",
+      "name_en": "drama",
+      "worthy": true,
+      "hint": "无画外音解说的剧情短片、影视切片或实拍情景剧，靠画面、表演与台词叙事。",
+      "hint_en": "Scripted story, film/TV clip or staged skit without voice-over narration; the plot is carried by scenes, acting and dialogue."
+    },
+    {
+      "name": "唱歌",
+      "name_en": "singing",
+      "worthy": false,
+      "hint": "唱歌、翻唱、说唱表演，演唱或音乐本身是内容主体（含清唱与乐器弹唱）。",
+      "hint_en": "The person(s) audibly perform the song themselves (vocal cover or performance is the content). Background music playing while someone talks, poses or dances is NOT singing."
+    },
+    {
+      "name": "舞蹈",
+      "name_en": "dance",
+      "worthy": false,
+      "hint": "舞蹈、手势舞、走秀等肢体表演，动作本身是内容主体；常配热门音乐。",
+      "hint_en": "Dance, hand-gesture dance, catwalk or other body-movement performance, usually set to trending music. Includes hand-gesture dances performed to camera with stickers/effects, even if the performer also lip-syncs."
+    },
+    {
+      "name": "游戏",
+      "name_en": "gameplay",
+      "worthy": false,
+      "hint": "游戏画面实况/录屏：无解说，或解说只是随意闲聊而非内容主体。",
+      "hint_en": "Raw game footage or livestream clips: no narration, or narration is casual chatter rather than the content itself."
+    },
+    {
+      "name": "纯音乐画面",
+      "name_en": "music_visual",
+      "worthy": false,
+      "hint": "音乐驱动的画面混剪：风景、卡点、氛围/治愈系画面，无人声内容承载。",
+      "hint_en": "Music-driven visual montage: scenery, beat-synced edits, ambience or mood visuals with no speech content."
+    },
+    {
+      "name": "其他",
+      "name_en": "other",
+      "worthy": true,
+      "hint": "以上类型都不符合的新形态。",
+      "hint_en": "None of the listed types fits; a new content form."
+    }
+  ]
+}

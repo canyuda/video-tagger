@@ -33,3 +33,10 @@ src-tauri/target/
 
 # macOS
 .DS_Store
+
+# Bundled ffmpeg build artifacts (fetched/built by scripts; see ffmpeg-bin/README.txt)
+/ffmpeg-bin/ffmpeg
+/ffmpeg-bin/ffprobe
+
+# Tauri externalBin build outputs (PyInstaller sidecar, dev wrapper)
+src-tauri/binaries/

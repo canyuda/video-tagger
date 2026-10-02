@@ -1,0 +1,90 @@
+{
+  "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36",
+  "now_ms": 1759400000000,
+  "seed": 42,
+  "cases": [
+    {
+      "query": "device_platform=webapp&aid=6383&channel=channel_pc_web&aweme_id=7350000000000000001&count=10&uifid=abc-uifid-123&msToken=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "a_bogus": "Ev05ke6JmdWbFdKSucaf9aPlG9jArP8yFsixbxNTyPucOHFbpRPrExtQaxLYsoxgrbpihCVHqd0MYEVcz0UTZonpzmkfSQhWvtVn906o0qqhGl4/ErDTe0DFwwseUOkNa/C3E1g5lsMx2jnRIN5NlpBaS5zoQcEgSNpcpMGytEW6DAukwn-kO9gkqg5t"
+    },
+    {
+      "query": "device_platform=webapp&aid=6383&sec_user_id=MS4wLjABAAAA9y04iBlVdeMQqTJbqsQZKb-tqWqWW29jPVJqideHT70&max_cursor=0&count=20&uifid=abc-uifid-123&msToken=YzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYzYz",
+      "a_bogus": "Ev05ke6JmdWbFdKSucaf9aPlG9jArP8yoTixSnpTyOY9OHzTpRPrExtQaxLYsoxgrbpihCVHqd0MYEVcz0UTZonpzmkfSQhWvtVn906o0qqhGl4/ErDTe0DFwwseUOkNa/C3E1g5lsMx2jnRIN5NlpBaS5zoQcEgSNpcpMGytEW6DAukwn-kO9gkqgR/"
+    }
+  ],
+  "websign": {
+    "normalized": "aid=6383&channel=channel_pc_web&uifid=abc-uifid-123&msToken=a%2Bb%3Dc",
+    "signed": [
+      "aid=6383&channel=channel_pc_web&uifid=abc-uifid-123&timestamp=1759400000&x-secsdk-web-signature=a5a12bb8232ba6e1ad1cb6af0a6c2acb",
+      "a5a12bb8232ba6e1ad1cb6af0a6c2acb"
+    ]
+  },
+  "sm3_abc": [
+    102,
+    199,
+    240,
+    244,
+    98,
+    238,
+    237,
+    217,
+    209,
+    242,
+    212,
+    107,
+    220,
+    16,
+    228,
+    226,
+    65,
+    103,
+    196,
+    135,
+    92,
+    242,
+    247,
+    162,
+    41,
+    125,
+    160,
+    43,
+    143,
+    75,
+    168,
+    224
+  ],
+  "sm3_cjk": [
+    172,
+    133,
+    165,
+    239,
+    133,
+    118,
+    198,
+    110,
+    117,
+    195,
+    111,
+    3,
+    122,
+    175,
+    137,
+    191,
+    60,
+    187,
+    62,
+    39,
+    69,
+    229,
+    149,
+    187,
+    71,
+    180,
+    126,
+    165,
+    63,
+    48,
+    248,
+    56
+  ]
+}

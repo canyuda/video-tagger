@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "TaskEvents",
+  "version": 1,
+  "stages": [
+    "created",
+    "downloading",
+    "probing",
+    "classifying",
+    "extracting",
+    "transcribing",
+    "sampling",
+    "analyzing"
+  ],
+  "task_statuses": [
+    "created",
+    "downloading",
+    "probing",
+    "classifying",
+    "extracting",
+    "transcribing",
+    "sampling",
+    "analyzing",
+    "classified",
+    "done",
+    "no_value",
+    "rejected",
+    "cancelled",
+    "failed"
+  ],
+  "definitions": {
+    "StageChanged": {
+      "description": "SSE event `stage_changed`: a task entered a new stage.",
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "stage": {
+          "description": "one of STAGES",
+          "title": "Stage",
+          "type": "string"
+        },
+        "at": {
+          "description": "UTC ISO-8601 timestamp",
+          "title": "At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id",
+        "stage",
+        "at"
+      ],
+      "title": "StageChanged",
+      "type": "object"
+    },
+    "Progress": {
+      "description": "SSE event `progress`: fine-grained progress within a stage.",
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "percent": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Percent",
+          "type": "number"
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        }
+      },
+      "required": [
+        "task_id",
+        "stage",
+        "percent"
+      ],
+      "title": "Progress",
+      "type": "object"
+    },
+    "TaskError": {
+      "description": "SSE event `error`: a stage failed (retryable or terminal).",
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "stage": {
+          "title": "Stage",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "retryable": {
+          "title": "Retryable",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "task_id",
+        "stage",
+        "message",
+        "retryable"
+      ],
+      "title": "TaskError",
+      "type": "object"
+    },
+    "Done": {
+      "description": "SSE event `done`: task reached a terminal state.",
+      "properties": {
+        "task_id": {
+          "title": "Task Id",
+          "type": "string"
+        },
+        "status": {
+          "description": "classified | done | no_value | rejected | cancelled | failed",
+          "title": "Status",
+          "type": "string"
+        },
+        "report_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Report Id"
+        }
+      },
+      "required": [
+        "task_id",
+        "status"
+      ],
+      "title": "Done",
+      "type": "object"
+    }
+  }
+}

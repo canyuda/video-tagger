@@ -1,0 +1,64 @@
+{
+  "$defs": {
+    "TaxonomyType": {
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "name_en": {
+          "default": "",
+          "title": "Name En",
+          "type": "string"
+        },
+        "worthy": {
+          "title": "Worthy",
+          "type": "boolean"
+        },
+        "hint": {
+          "title": "Hint",
+          "type": "string"
+        },
+        "hint_en": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Hint En"
+        }
+      },
+      "required": [
+        "name",
+        "worthy",
+        "hint"
+      ],
+      "title": "TaxonomyType",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "version": {
+      "title": "Version",
+      "type": "integer"
+    },
+    "types": {
+      "items": {
+        "$ref": "#/$defs/TaxonomyType"
+      },
+      "title": "Types",
+      "type": "array"
+    }
+  },
+  "required": [
+    "version",
+    "types"
+  ],
+  "title": "Taxonomy",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

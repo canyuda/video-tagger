@@ -1,0 +1,38 @@
+[project]
+name = "video-analysis-sidecar"
+version = "0.1.0"
+description = "Video content analysis pipeline — Phase 0 classification CLI first (docs/02)"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.142.2",
+    "httpx>=0.28",
+    "numpy>=2.5.3",
+    "pillow>=12.3.0",
+    "pydantic>=2.12",
+    "uvicorn>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.22.3",
+    "pytest>=8.4",
+    "ruff>=0.13",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["sidecar"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["SIM108"]  # ternary is not always more readable
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
