@@ -27,8 +27,10 @@ if [[ ! -d "${SRC}" ]]; then
 fi
 
 cd "${SRC}"
+# --disable-x86asm: CI runners lack nasm; portable build with negligible cost.
 ./configure \
   --disable-doc --disable-debug --disable-autodetect --disable-network \
+  --disable-x86asm \
   --enable-protocol=file \
   --enable-demuxer=mov,matroska,webm,mp3,wav,aac \
   --enable-muxer=mp3,null,adts \

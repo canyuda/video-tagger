@@ -40,6 +40,13 @@ jobs:
 
       # docs/04 §8: distribution must bundle an LGPL ffmpeg. Built from source
       # (no --enable-gpl) on every platform; windows runs it inside msys2.
+      - name: Install lame (macOS/Linux)
+        if: runner.os != 'Windows'
+        run: |
+          if command -v brew >/dev/null; then brew install lame
+          elif command -v apt-get >/dev/null; then sudo apt-get update && sudo apt-get install -y libmp3lame-dev
+          fi
+
       - name: Build LGPL ffmpeg (macOS/Linux)
         if: runner.os != 'Windows'
         shell: bash
