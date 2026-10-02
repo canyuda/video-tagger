@@ -28,5 +28,8 @@ src-tauri/target/
 # Tool local index (codegraph MCP)
 .codegraph/
 
+# Evaluation set videos (douyin downloads, personal research only — large binaries)
+/eval-videos/
+
 # macOS
 .DS_Store

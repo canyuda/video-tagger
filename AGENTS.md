@@ -7,6 +7,7 @@ Windows + macOS 桌面应用，两阶段交付：**V1 视频分类工具**（导
 - **本目录是正式项目**：一切实现工作在本目录的项目会话进行（覆盖工作区根 AGENTS.md「工作区会话只调研不写码」的边界——那是对调研会话的约束）。
 - 当前只有 docs/ 设计文档，**源码未开始、git 未初始化**（首个 commit 不得含任何密钥，`git status` 看不到 `.env.local` 即验证通过）。
 - 下一步：Phase 0 分类内核 CLI（Python），任务卡与实测清单见 docs/07 §5；openspec/ 已初始化（opsx 变更工作流），暂无活动 change。
+- 分类评测集：`eval-videos/`（git 忽略的本地数据）——视频 `video-NN.mp4`、`mapping.csv`（aweme_id 溯源）、`labels.csv`（ground truth，name_en 键；草稿需人工确认）、`README.md`（构成与缺口）。
 
 ## 文档导航（开工必读）
 
@@ -39,7 +40,7 @@ Windows + macOS 桌面应用，两阶段交付：**V1 视频分类工具**（导
 
 ## 凭据与安全
 
-- `.env.local`（权限 600，git 已忽略）存全部 key：DASHSCOPE_API_KEY（必填）、TYPESAFE_API_KEY（主源 `~/.agentguardrc`）、ZHIPU_API_KEY、ARK_API_KEY、OSS_*（**默认不启用**，现指向团队测试桶，勿写）、DOUYIN_COOKIE。字段说明见 `.env.example`。
+- `.env.local`（权限 600，git 已忽略）存全部 key：DASHSCOPE_API_KEY（必填）、TYPESAFE_API_KEY（Jev 决策层）、ZHIPU_API_KEY、ARK_API_KEY、OSS_*（**默认不启用**，现指向团队测试桶，勿写）、DOUYIN_COOKIE。字段说明见 `.env.example`。
 - **被 .gitignore 排除的文件（尤其 `.env.local`）禁止读取、禁止入代码/日志/文档/git。**
 - key 读取顺序：环境变量 → `.env.local`，缺失即启动报错。
 - 双机开发：家庭 Mac 开发、公司 Windows 真机验证；公司机无 `.env.local`，需加密渠道手动同步。

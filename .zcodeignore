@@ -21,9 +21,15 @@ node_modules/
 # Tauri / Rust
 src-tauri/target/
 
-# App data, caches, logs
-data/
+# App data, caches, logs (root-anchored so tool skill data dirs are not affected)
+/data/
 *.log
+
+# Tool local index (codegraph MCP)
+.codegraph/
+
+# Evaluation set videos (douyin downloads, personal research only — large binaries)
+/eval-videos/
 
 # macOS
 .DS_Store
