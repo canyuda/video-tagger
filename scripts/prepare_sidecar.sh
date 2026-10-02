@@ -41,8 +41,8 @@ uv run pyinstaller \
   --distpath "${BIN_DIR}/dist" \
   --workpath "${BIN_DIR}/build" \
   --specpath "${BIN_DIR}" \
-  --add-data "${ROOT}/sidecar/taxonomy/default.json${SEP}sidecar/taxonomy" \
-  --add-data "${ROOT}/ffmpeg-bin${SEP}ffmpeg-bin" \
+  --add-data "sidecar/taxonomy/default.json${SEP}sidecar/taxonomy" \
+  --add-data "ffmpeg-bin${SEP}ffmpeg-bin" \
   --collect-submodules uvicorn \
   sidecar/api/run.py
 
