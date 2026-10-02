@@ -286,3 +286,19 @@ class TestFrames:
             assert client.get(
                 f"/tasks/{tid}/frames/{bad}?token={token}"
             ).status_code in (400, 404)
+
+
+class TestWorkRootConsistency:
+    def test_classifier_gets_same_work_root_as_app(self, tmp_path):
+        """Frames must be extracted into the SAME work_root the frames
+        endpoint reads — the packaged regression was classifier in _MEIPASS,
+        endpoint in app-data (frames listed as empty forever)."""
+        from sidecar.api.app import _build_classifier, create_app
+
+        app = create_app(
+            db_path=tmp_path / "w.db", token="t", start_worker=False,
+            work_root=tmp_path / "custom-work",
+        )
+        app.state.store.init()
+        classifier = _build_classifier(app)
+        assert classifier.work_root == tmp_path / "custom-work"

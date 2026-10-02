@@ -542,7 +542,9 @@ def _build_classifier(app: FastAPI):
 
     settings = _load_settings(app)
     taxonomy = _load(json.dumps(_taxonomy_json(app.state.store)))
-    return build_classifier(settings, taxonomy, work_root=_work_default())
+    return build_classifier(
+        settings, taxonomy, work_root=app.state.work_root or _work_default()
+    )
 
 
 def _build_douyin_client(app: FastAPI):
