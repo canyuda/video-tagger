@@ -204,3 +204,30 @@ input { cursor: text; width: 100%; }
   border-left: 3px solid var(--accent); margin: 6px 0; padding: 2px 10px; color: var(--muted);
 }
 .report pre { background: var(--bg); padding: 10px; border-radius: 8px; overflow-x: auto; }
+
+/* 分析主线（D58）的样式补充 */
+.chip.ok { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
+.chip.dim { background: var(--bg); color: var(--muted); }
+.chip.accent { background: var(--accent-soft); color: var(--accent); }
+.badge.dim-badge { color: var(--muted); }
+.badge.ok-badge { color: var(--ok); border-color: var(--ok); }
+.card-action { margin-top: 10px; width: 100%; }
+.basis { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 10px; }
+.basis summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+.analysis-instructions { margin: 8px 0; }
+.analyses { padding: 20px; overflow-y: auto; }
+.analyses .section { margin: 18px 0 10px; }
+.run-list { display: flex; flex-direction: column; gap: 8px; }
+.run-card {
+  background: var(--panel); border: 1px solid var(--accent); border-radius: var(--radius);
+  padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+}
+.run-title { font-weight: 600; }
+.run-stage { color: var(--accent); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.spinner {
+  width: 12px; height: 12px; border: 2px solid var(--accent);
+  border-top-color: transparent; border-radius: 50%;
+  animation: spin 0.8s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.report-summary { font-size: 13px; color: var(--muted); margin: 6px 0; }

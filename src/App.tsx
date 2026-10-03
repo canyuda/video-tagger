@@ -3,14 +3,15 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { api, configureSidecar, type SidecarInfo, type SettingsView, type Task } from "./api";
 import Library from "./pages/Library";
+import Analyses from "./pages/Analyses";
 import Settings from "./pages/Settings";
 import Onboarding from "./pages/Onboarding";
 import TaskDetail from "./pages/TaskDetail";
 
-type Tab = "library" | "settings";
+type Tab = "analyses" | "library" | "settings";
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>("library");
+  const [tab, setTab] = useState<Tab>("analyses");
   const [ready, setReady] = useState(false);
   const [fatal, setFatal] = useState("");
   const [settings, setSettings] = useState<SettingsView | null>(null);
@@ -140,18 +141,26 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          视频分类 <span className="brand-en">video-tagger</span>
+          视频内容分析 <span className="brand-en">video-tagger</span>
         </div>
         <nav>
+          <button
+            className={tab === "analyses" ? "active" : ""}
+            onClick={() => setTab("analyses")}
+          >
+            分析
+          </button>
           <button className={tab === "library" ? "active" : ""} onClick={() => setTab("library")}>
-            任务库
+            素材库
           </button>
           <button className={tab === "settings" ? "active" : ""} onClick={() => setTab("settings")}>
             设置
           </button>
         </nav>
       </header>
-      {tab === "library" ? (
+      {tab === "analyses" ? (
+        <Analyses onOpen={(id) => setSelected(id)} />
+      ) : tab === "library" ? (
         <Library
           tasks={tasks}
           onRefresh={refresh}

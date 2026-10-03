@@ -142,10 +142,22 @@ export const api = {
     }),
   checkDouyinCookie: () => request<{ status: string; reason: string }>("/douyin/check-cookie"),
   cancel: (id: string) => request<Task>(`/tasks/${id}/cancel`, { method: "POST" }),
-  analyze: (id: string, body: { template_id?: string; instructions?: string; override?: boolean }) =>
-    request<Task>(`/tasks/${id}/analyze`, { method: "POST", body: JSON.stringify(body) }),
+  analyze: (
+    id: string,
+    body: { template_id?: string; model?: string; instructions?: string; override?: boolean },
+  ) => request<Task>(`/tasks/${id}/analyze`, { method: "POST", body: JSON.stringify(body) }),
+  getRecommendation: (id: string) =>
+    request<{ template_id: string; model: string; reason: string; type: string | null }>(
+      `/tasks/${id}/analyze-recommendation`,
+    ),
   getReport: (id: string) => request<ReportView>(`/tasks/${id}/report`),
   templates: () => request<TemplateLite[]>(`/templates`),
+  routing: () => request<Record<string, { template_id: string; model: string }>>("/analysis/routing"),
+  putRouting: (table: Record<string, { template_id: string; model: string }>) =>
+    request<Record<string, { template_id: string; model: string }>>("/analysis/routing", {
+      method: "PUT",
+      body: JSON.stringify(table),
+    }),
   retry: (id: string) => request<Task>(`/tasks/${id}/retry`, { method: "POST" }),
   reclassify: (id: string) =>
     request<Task>(`/tasks/${id}/reclassify`, { method: "POST" }),

@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { api, type SettingsView } from "../api";
 import type { Taxonomy, TaxonomyType } from "../contracts";
 
+type RoutingTable = Record<string, { template_id: string; model: string }>;
+
+const MODEL_CHOICES = ["qwen3-vl-flash", "qwen3-vl-plus", "glm-4.6v-flash"];
+
 export default function Settings({ onSaved }: { onSaved: () => void }) {
   const [view, setView] = useState<SettingsView | null>(null);
   const [taxonomy, setTaxonomy] = useState<Taxonomy | null>(null);
@@ -10,6 +14,8 @@ export default function Settings({ onSaved }: { onSaved: () => void }) {
   const [threshold, setThreshold] = useState("0.85");
   const [cookieValue, setCookieValue] = useState("");
   const [cookieState, setCookieState] = useState("");
+  const [routing, setRouting] = useState<RoutingTable | null>(null);
+  const [tplList, setTplList] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -18,6 +24,8 @@ export default function Settings({ onSaved }: { onSaved: () => void }) {
       if (v.stored?.frame_count) setFrameCount(v.stored.frame_count);
       if (v.stored?.confidence_threshold) setThreshold(v.stored.confidence_threshold);
       setTaxonomy(await api.taxonomy());
+      setRouting(await api.routing());
+      api.templates().then(setTplList).catch(() => {});
     })();
   }, []);
 
@@ -147,6 +155,77 @@ export default function Settings({ onSaved }: { onSaved: () => void }) {
             恢复默认
           </button>
         </div>
+      </section>
+
+      <section>
+        <h3>分析路由（分类 → 提示词 + 模型）</h3>
+        <p className="muted">
+          D58：分类是分析的前置——按内容类型预选分析用的提示词模板与模型档；
+          分析时可临时更改。`_default` 兜底未知类型。
+        </p>
+        {routing && (
+          <table className="tax-table">
+            <thead>
+              <tr>
+                <th>内容类型</th>
+                <th>提示词模板</th>
+                <th>模型</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(routing).map(([typeKey, entry]) => (
+                <tr key={typeKey}>
+                  <td>{typeKey}</td>
+                  <td>
+                    <select
+                      value={entry.template_id}
+                      onChange={(e) =>
+                        setRouting({
+                          ...routing,
+                          [typeKey]: { ...entry, template_id: e.target.value },
+                        })
+                      }
+                    >
+                      {(tplList.length ? tplList : [{ id: "tpl-general", name: "通用总结" }]).map(
+                        (tpl) => (
+                          <option key={tpl.id} value={tpl.id}>{tpl.name}</option>
+                        ),
+                      )}
+                    </select>
+                  </td>
+                  <td>
+                    <select
+                      value={entry.model}
+                      onChange={(e) =>
+                        setRouting({
+                          ...routing,
+                          [typeKey]: { ...entry, model: e.target.value },
+                        })
+                      }
+                    >
+                      {MODEL_CHOICES.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+        <button
+          onClick={async () => {
+            if (!routing) return;
+            try {
+              setRouting(await api.putRouting(routing));
+              flash("分析路由已保存");
+            } catch (e) {
+              flash(`保存失败: ${e}`);
+            }
+          }}
+        >
+          保存路由
+        </button>
       </section>
 
       <section>

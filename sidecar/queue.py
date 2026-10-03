@@ -78,7 +78,7 @@ class TaskWorker:
         poll_interval: float = 0.5,
         work_root: Path | None = None,
         douyin_factory: Callable[[], object] | None = None,
-        analyzer_factory: Callable[[], object] | None = None,
+        analyzer_factory: Callable[..., object] | None = None,
     ) -> None:
         self.store = store
         self.factory = classifier_factory
@@ -348,7 +348,9 @@ class TaskWorker:
             self._finish_rejected(task_id, "extracting", f"文件损坏或无法解析: {e}")
             return
 
-        analyzer = self.analyzer_factory()
+        request_model = (request or {}).get("model")
+        analyzer = self.analyzer_factory(model=request_model) if request_model \
+            else self.analyzer_factory()
         try:
             analyzer.check_duration(info.duration)
         except AnalysisError as e:

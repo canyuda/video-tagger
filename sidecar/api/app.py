@@ -16,6 +16,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 
+from sidecar.analysis_routing import RoutingError
 from sidecar.config import ConfigError, Settings, load_settings
 from sidecar.queue import EventBus, TaskWorker
 from sidecar.store import Store
@@ -66,6 +67,14 @@ def create_app(
         from sidecar.store import seed_templates
 
         seed_templates(app.state.store)
+        if app.state.store.get_setting("analysis_routing") is None:
+            import json as _json
+
+            from sidecar.analysis_routing import DEFAULT_ROUTING
+
+            app.state.store.set_setting(
+                "analysis_routing", _json.dumps(DEFAULT_ROUTING, ensure_ascii=False)
+            )
         # Crash recovery (docs/04 §6: 杀进程重启续跑): tasks left mid-stage by
         # a previous process go back to the queue; finished stages are skipped
         # via the artifact cache.
@@ -332,6 +341,55 @@ def create_app(
                                  headers={"Content-Disposition":
                                           "attachment; filename=tasks.csv"})
 
+    # -- D58: analysis routing (type -> template + model) -------------------
+
+    @app.get("/analysis/routing")
+    def get_routing() -> dict:
+        import json as _json
+
+        raw = app.state.store.get_setting("analysis_routing")
+        return _json.loads(raw) if raw else {}
+
+    @app.put("/analysis/routing")
+    def put_routing(body: dict) -> dict:
+        import json as _json
+
+        from sidecar.analysis_routing import normalize_routing
+
+        try:
+            table = normalize_routing(body)
+        except RoutingError as e:
+            raise HTTPException(422, str(e)) from e
+        app.state.store.set_setting(
+            "analysis_routing", _json.dumps(table, ensure_ascii=False)
+        )
+        return table
+
+    @app.get("/tasks/{task_id}/analyze-recommendation")
+    def analyze_recommendation(task_id: str) -> dict:
+        """D58: classification drives the analysis decision — recommend
+        template + model for the classified type (user may override)."""
+        import json as _json
+
+        from sidecar.analysis_routing import recommend
+
+        task = _require_task(app, task_id)
+        classify = next(
+            (row["payload"] for row in app.state.store.list_artifacts(task_id)
+             if row["stage"] == "classify"),
+            None,
+        )
+        type_key = (classify or {}).get("type") or task.get("result_type")
+        raw = app.state.store.get_setting("analysis_routing")
+        table = _json.loads(raw) if raw else {}
+        rec = recommend(table, type_key)
+        # 模板不存在（被删）则回落通用模板
+        if app.state.store.get_template(rec["template_id"]) is None:
+            rec["template_id"] = "tpl-general"
+        rec["reason"] = f"类型 {type_key or '未知'} 的默认路由"
+        rec["type"] = type_key
+        return rec
+
     # -- V2: analysis / report / templates ---------------------------------
 
     @app.post("/tasks/{task_id}/analyze")
@@ -343,10 +401,14 @@ def create_app(
             raise HTTPException(409, f"cannot analyze from status {task['status']}")
         if task["status"] == "rejected" and (task.get("error_stage") == "extracting"):
             raise HTTPException(409, task.get("error_msg") or "任务不可分析")
+        model = body.get("model") or None
+        if model:
+            _build_analyzer(app, model=model)  # early-validate model/key availability
         app.state.store.put_artifact(task_id, "analysis_request", 1, {
             "template_id": body.get("template_id") or "tpl-general",
             "instructions": body.get("instructions") or "",
             "override": bool(body.get("override")),
+            "model": model,
         })
         app.state.store.update_task(task_id, status="extracting", stage="extracting",
                                     error_stage=None, error_msg=None)
@@ -560,19 +622,24 @@ def _work_default() -> Path:
     return DATA_ROOT / "work"
 
 
-def _build_analyzer(app: FastAPI):
+def _build_analyzer(app: FastAPI, model: str | None = None):
     from sidecar.analyzer.pipeline import Analyzer
-    from sidecar.classify.factory import DATA_ROOT
     from sidecar.providers.asr import AsrProvider
     from sidecar.providers.chat import ChatProvider
 
     settings = _load_settings(app)
+    chosen = model or settings.dashscope_vlm_model
+    # 模型路由（D58）：glm-* 走智谱，其余走百炼；均为 OpenAI 兼容端点。
+    if chosen.startswith("glm-"):
+        base_url, api_key = settings.zhipu_base_url, settings.zhipu_api_key
+        if not api_key:
+            raise HTTPException(409, "该模型需要智谱 ZHIPU_API_KEY（设置中配置）")
+    else:
+        base_url, api_key = settings.dashscope_base_url, settings.dashscope_api_key
     return Analyzer(
-        chat=ChatProvider(base_url=settings.dashscope_base_url,
-                          api_key=settings.dashscope_api_key,
-                          model=settings.dashscope_vlm_model),
+        chat=ChatProvider(base_url=base_url, api_key=api_key, model=chosen),
         asr=AsrProvider(base_url=settings.dashscope_native_base_url,
                         api_key=settings.dashscope_api_key),
-        work_root=DATA_ROOT / "work",
-        model=settings.dashscope_vlm_model,
+        work_root=app.state.work_root or _work_default(),
+        model=chosen,
     )

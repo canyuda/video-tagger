@@ -77,6 +77,22 @@ export default function Library({
     }
   }
 
+  async function quickAnalyze(id: string) {
+    try {
+      const rec = await api.getRecommendation(id);
+      await api.analyze(id, {
+        template_id: rec.template_id,
+        model: rec.model,
+      });
+      setToast("已按分类推荐开始分析（转写约 1 分钟起）");
+      setTimeout(() => setToast(""), 4000);
+      onRefresh();
+    } catch (e) {
+      setToast(`分析失败: ${e}`);
+      setTimeout(() => setToast(""), 4000);
+    }
+  }
+
   async function importLinks() {
     const links = pasteText.split(/\n+/).map((s) => s.trim()).filter(Boolean);
     if (!links.length) return;
@@ -112,12 +128,21 @@ export default function Library({
   }, [tasks, typeFilter, sourceFilter, worthyOnly, keyword, taxonomy]);
 
   const stats = useMemo(() => {
-    const byType: Record<string, number> = {};
+    // 分析视角的统计（D58）：分类只是素材属性，不再是主页主统计。
+    let done = 0, analyzable = 0, noValue = 0, busy = 0;
+    const unworthy = new Set(
+      (taxonomy?.types || []).filter((t) => !t.worthy).map((t) => t.name_en || t.name),
+    );
     for (const t of tasks) {
-      if (t.result_type) byType[t.result_type] = (byType[t.result_type] || 0) + 1;
+      if (t.status === "done") done += 1;
+      if (["extracting", "transcribing", "sampling", "analyzing"].includes(t.status)) busy += 1;
+      if (t.result_type) {
+        if (unworthy.has(t.result_type)) noValue += 1;
+        else analyzable += 1;
+      }
     }
-    return byType;
-  }, [tasks]);
+    return { done, analyzable, noValue, busy };
+  }, [tasks, taxonomy]);
 
   const activeCount = tasks.filter((t) =>
     ["created", "probing", "classifying"].includes(t.status),
@@ -190,16 +215,15 @@ export default function Library({
       )}
 
       <div className="stats-bar">
-        {Object.entries(stats).length === 0 ? (
-          <span className="muted">暂无分类结果</span>
+        {tasks.length === 0 ? (
+          <span className="muted">导入视频后，分类将自动判断分析价值</span>
         ) : (
-          Object.entries(stats)
-            .sort((a, b) => b[1] - a[1])
-            .map(([type, count]) => (
-              <button key={type} className="chip" onClick={() => setTypeFilter(type)}>
-                {type} <b>{count}</b>
-              </button>
-            ))
+          <>
+            <span className="chip ok">可分析 {stats.analyzable}</span>
+            <span className="chip dim">无价值 {stats.noValue}</span>
+            <span className="chip accent">分析中 {stats.busy}</span>
+            <span className="chip accent">已出报告 {stats.done}</span>
+          </>
         )}
       </div>
 
@@ -217,7 +241,12 @@ export default function Library({
       ) : (
         <div className="grid">
           {filtered.map((t) => (
-            <TaskCard key={t.id} task={t} onOpen={() => onOpen(t.id)} />
+            <TaskCard
+              key={t.id}
+              task={t}
+              onOpen={() => onOpen(t.id)}
+              onStartAnalysis={() => quickAnalyze(t.id)}
+            />
           ))}
         </div>
       )}
@@ -227,28 +256,53 @@ export default function Library({
   );
 }
 
-function TaskCard({ task, onOpen }: { task: Task; onOpen: () => void }) {
+function TaskCard({
+  task,
+  onOpen,
+  onStartAnalysis,
+}: {
+  task: Task;
+  onOpen: () => void;
+  onStartAnalysis: () => void;
+}) {
   const name = (task.file_path || "").split("/").pop() || task.file_path;
   const statusZh = STATUS_ZH[task.status] || task.status;
-  const busy = ["created", "probing", "classifying"].includes(task.status);
+  const analyzing = ["extracting", "transcribing", "sampling", "analyzing"].includes(task.status);
+  const analyzed = task.status === "done";
+  // 分析视角的卡片（D58）：主按钮是「分析」，分类结果只是一个小角标。
   return (
-    <div className={`card ${busy ? "busy" : ""}`} onClick={onOpen}>
+    <div className={`card ${analyzing ? "busy" : ""}`} onClick={onOpen}>
       <div className="card-head">
         <span className={`badge src-${task.source_type}`}>
           {task.source_type === "douyin" ? "抖音" : "本地"}
         </span>
-        {task.result_type && <span className="badge type">{task.result_type}</span>}
+        {task.result_type && <span className="badge dim-badge">{task.result_type}</span>}
+        {task.status === "done" && <span className="badge ok-badge">已出报告</span>}
       </div>
       <div className="card-title" title={name}>{name}</div>
       <div className={`card-status st-${task.status}`}>
-        {statusZh}
-        {task.confidence != null && ` · 置信 ${task.confidence.toFixed(2)}`}
+        {analyzed
+          ? "报告已生成"
+          : analyzing
+            ? "分析中…"
+            : statusZh}
       </div>
       {task.status === "failed" && task.error_stage && (
         <div className="card-error">失败阶段：{stageZh(task.error_stage)}</div>
       )}
       {task.status === "rejected" && task.error_msg && (
         <div className="card-error">{task.error_msg}</div>
+      )}
+      {!analyzing && ["classified", "done", "no_value"].includes(task.status) && (
+        <button
+          className="primary card-action"
+          onClick={(e) => {
+            e.stopPropagation();
+            onStartAnalysis();
+          }}
+        >
+          {analyzed ? "重新分析" : "开始分析"}
+        </button>
       )}
     </div>
   );
