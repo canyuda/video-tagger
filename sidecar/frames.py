@@ -15,7 +15,7 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from sidecar.media import MediaError
+from sidecar.media import MediaError, _binary
 
 DEFAULT_MAX_INTERVAL = 5.0
 DEFAULT_SCENE_THRESHOLD = 0.35
@@ -114,11 +114,11 @@ def dedupe_by_phash(frames: list[tuple[float, int, Path]],
 
 
 def scene_cut_timestamps(
-    video: Path, threshold: float = DEFAULT_SCENE_THRESHOLD, ffmpeg: str = "ffmpeg"
+    video: Path, threshold: float = DEFAULT_SCENE_THRESHOLD, ffmpeg: str | None = None
 ) -> list[float]:
     """Scene-cut timestamps via ffmpeg select+showinfo (stderr parse)."""
     cmd = [
-        ffmpeg, "-v", "info", "-i", str(video),
+        _binary("ffmpeg"), "-v", "info", "-i", str(video),
         "-vf", f"select='gt(scene,{threshold})',showinfo",
         "-f", "null", "-",
     ]
@@ -131,10 +131,10 @@ def scene_cut_timestamps(
 
 
 def extract_frame(video: Path, timestamp: float, out_path: Path,
-                  max_edge: int = 768, ffmpeg: str = "ffmpeg") -> Path:
+                  max_edge: int = 768, ffmpeg: str | None = None) -> Path:
     scale = f"scale='min({max_edge},iw)':'min({max_edge},ih)':force_original_aspect_ratio=decrease"
     cmd = [
-        ffmpeg, "-v", "error", "-y", "-ss", f"{timestamp:.3f}", "-i", str(video),
+        _binary("ffmpeg"), "-v", "error", "-y", "-ss", f"{timestamp:.3f}", "-i", str(video),
         "-frames:v", "1", "-vf", scale, "-q:v", "4", str(out_path),
     ]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
@@ -151,7 +151,7 @@ def extract_keyframes(
     interval: float = DEFAULT_MAX_INTERVAL,
     max_frames: int = DEFAULT_MAX_FRAMES,
     max_edge: int = 768,
-    ffmpeg: str = "ffmpeg",
+    ffmpeg: str | None = None,
 ) -> list[FrameRef]:
     """Full V2 keyframe pipeline for one video."""
     out_dir.mkdir(parents=True, exist_ok=True)
