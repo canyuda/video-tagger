@@ -89,7 +89,7 @@ def create_app(
                 concurrency=concurrency,
                 work_root=work_root,
                 douyin_factory=lambda: _build_douyin_client(app),
-                analyzer_factory=lambda: _build_analyzer(app),
+                analyzer_factory=lambda model=None: _build_analyzer(app, model=model),
             )
             app.state.worker.start(concurrency)
 

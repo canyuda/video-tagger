@@ -348,9 +348,7 @@ class TaskWorker:
             self._finish_rejected(task_id, "extracting", f"文件损坏或无法解析: {e}")
             return
 
-        request_model = (request or {}).get("model")
-        analyzer = self.analyzer_factory(model=request_model) if request_model \
-            else self.analyzer_factory()
+        analyzer = self.analyzer_factory(model=(request or {}).get("model"))
         try:
             analyzer.check_duration(info.duration)
         except AnalysisError as e:
@@ -455,7 +453,7 @@ class TaskWorker:
         self.bus.publish(task_id, "done", {"task_id": task_id, "status": status})
 
 
-def _default_analyzer_factory():
+def _default_analyzer_factory(model: str | None = None):
     """Fallback analyzer factory; the app injects a settings-aware one."""
     from sidecar.analyzer.pipeline import Analyzer
     from sidecar.classify.factory import DATA_ROOT
@@ -464,14 +462,15 @@ def _default_analyzer_factory():
     from sidecar.providers.chat import ChatProvider
 
     settings = load_settings({})
+    chosen = model or settings.dashscope_vlm_model
     return Analyzer(
         chat=ChatProvider(base_url=settings.dashscope_base_url,
                           api_key=settings.dashscope_api_key,
-                          model=settings.dashscope_vlm_model),
+                          model=chosen),
         asr=AsrProvider(base_url=settings.dashscope_native_base_url,
                         api_key=settings.dashscope_api_key),
         work_root=DATA_ROOT / "work",
-        model=settings.dashscope_vlm_model,
+        model=chosen,
     )
 
 
